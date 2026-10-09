@@ -1,0 +1,10 @@
+* text=auto
+
+# Questi due nascono a LF e cosi' devono restare.
+pc/GestioneHome.ps1 text eol=lf
+pc/pagine/Radio.ps1 text eol=lf
+
+*.png binary
+*.webp binary
+*.ico binary
+*.pem text eol=lf

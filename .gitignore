@@ -1,0 +1,30 @@
+# Compilazione
+build/
+tablet/build/
+telefono/build/
+pc/bin/
+
+# La chiave che firma l'APK: build.ps1 ne crea una tua se manca.
+keystore/
+*.jks
+
+# go-librespot si scarica con tools/prendi-librespot.ps1 (GPLv3, non e' nostro).
+tablet/jniLibs/armeabi-v7a/*.so
+
+# Le configurazioni scritte da Gestione Home: lampade con le chiavi, routine,
+# app, radio, voce. Casa e Gestione Home le ricreano da sole.
+pc/config/
+
+# adb e gli altri strumenti di Google: si scaricano a parte (vedi README).
+tools/platform-tools/
+
+# Registrazioni e dati per la parola di attivazione
+pc/voce/
+pc/parola/dati/
+
+*.apk
+*.idsig
+desktop.ini
+
+# Lo scrive tools/collegamento.ps1 col percorso di chi lo usa.
+pc/avvia.vbs

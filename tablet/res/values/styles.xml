@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Il tema di Casa.
+
+     Un file di risorse, non una libreria: la regola del progetto vieta le
+     dipendenze esterne, non le risorse. E questi tre attributi a runtime non si
+     possono impostare - devono essere decisi prima che la finestra esista.
+
+     windowDisablePreview e' quello che si nota davvero. La Home viene
+     rilanciata di continuo - ogni volta che si chiude un'app, ogni volta che si
+     preme Home - e a ogni rilancio il sistema mostra una "finestra di avvio"
+     dipinta col windowBackground del tema, per una frazione di secondo, prima
+     che l'app disegni. Senza questo attributo, tornare a Casa lampeggia.
+
+     windowBackground e' comunque il nostro fondo scuro e non un bianco di
+     serie: se un giorno quella finestra tornasse a comparire, comparirebbe del
+     colore giusto. -->
+<resources>
+
+    <style name="TemaCasa" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@color/fondo</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:colorBackground">@color/fondo</item>
+    </style>
+
+</resources>

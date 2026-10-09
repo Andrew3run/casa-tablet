@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Casa sul telefono: il telecomando del tablet, e lo specchio della sveglia.
+
+     Package suo, dev.casa.telefono, e non dev.casa: due APK con lo stesso
+     package non convivono, e sul telefono non c'e' niente del tablet.
+
+     usesCleartextTraffic perche' si parla col tablet in HTTP semplice dentro la
+     rete di casa: da targetSdk 28 HttpURLConnection lo rifiuta di serie. Non si
+     manda niente in chiaro che valga qualcosa - ogni richiesta e' firmata con una
+     chiave che sul filo non passa mai, tranne una volta all'abbinamento. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="dev.casa.telefono">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- NSD: la ricerca del tablet passa da mDNS, che e' multicast. -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@drawable/icona"
+        android:allowBackup="false"
+        android:supportsRtl="false"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/TemaTelefono">
+
+        <activity
+            android:name=".Principale"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Tutte e due sono nell'elenco delle eccezioni ai broadcast impliciti:
+             arrivano a un ricevitore dichiarato qui anche con targetSdk 26+. -->
+        <receiver
+            android:name=".Ricevitore"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.app.action.NEXT_ALARM_CLOCK_CHANGED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".LavoroSveglia"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+    </application>
+</manifest>

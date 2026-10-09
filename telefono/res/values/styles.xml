@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Il fondo e' quello del tablet (colors.xml di Casa), e l'accento e' la tinta
+     della Camera: aprendo l'app sul telefono si deve riconoscere la stessa casa,
+     non un'app qualsiasi con il viola di serie.
+
+     Barre di sistema trasparenti: l'app disegna da bordo a bordo e si tiene
+     lontana da ora, notch e tasti con gli inset, in Principale.applicaInsets.
+     Con targetSdk 35+ Android 15 lo impone comunque; farlo apposta vuol dire
+     che e' uguale su tutti i telefoni. -->
+<resources>
+    <color name="fondo">#FF080B10</color>
+    <color name="accento">#FFF2D06B</color>
+
+    <style name="TemaTelefono" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/fondo</item>
+        <item name="android:colorBackground">@color/fondo</item>
+        <item name="android:colorAccent">@color/accento</item>
+        <item name="android:colorPrimary">@color/fondo</item>
+        <item name="android:colorPrimaryDark">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:alertDialogTheme">@style/TemaDialogo</item>
+        <item name="android:timePickerDialogTheme">@style/TemaDialogo</item>
+    </style>
+
+    <style name="TemaDialogo" parent="@android:style/Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">@color/accento</item>
+        <item name="android:colorPrimary">@color/fondo</item>
+        <item name="android:textColorPrimary">#FFF2F5F8</item>
+        <item name="android:backgroundDimAmount">0.45</item>
+        <item name="android:timePickerStyle">@style/OrologioDialogo</item>
+    </style>
+
+    <!-- Senza, la testata dell'orologio e il quadrante sono grigio pieno
+         dentro un dialogo di vetro. -->
+    <style name="OrologioDialogo" parent="@android:style/Widget.Material.TimePicker">
+        <item name="android:headerBackground">@android:color/transparent</item>
+        <item name="android:numbersBackgroundColor">#1FFFFFFF</item>
+        <item name="android:numbersSelectorColor">@color/accento</item>
+    </style>
+</resources>

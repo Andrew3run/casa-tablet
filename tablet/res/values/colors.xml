@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Un colore solo, e sta qui perche' il tema non puo' leggerlo da Tinte.java.
+
+     Tutti gli altri colori di Casa vivono in Tinte.java, dove il codice li usa.
+     Questo e' il fondo della finestra, che il sistema deve conoscere prima che
+     esista una riga di Java: se un giorno la finestra di avvio ricomparisse,
+     deve essere di questo colore e non del bianco di serie. -->
+<resources>
+    <color name="fondo">#FF0B0F14</color>
+</resources>

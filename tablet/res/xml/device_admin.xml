@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Le politiche che Casa chiede come device owner. Sono poche di proposito:
+     qui si dichiara solo quello che serve a fare il chiosco. Il resto delle
+     capacita' del device owner (lock task, barre di sistema, installazioni
+     silenziose) non passa da questo elenco. -->
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies>
+        <disable-keyguard-features />
+        <force-lock />
+    </uses-policies>
+</device-admin>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Casa: la Home del DUODUOGO E960.
+
+     Non e' un'app che si apre, e' quello che il tablet mostra quando e'
+     acceso. Da qui la categoria HOME e l'assenza di un'icona nel cassetto:
+     l'icona non serve a niente se non c'e' nessun cassetto da cui aprirla.
+
+     I permessi dichiarati qui sono quelli che serviranno; il codice che li usa
+     arriva dopo, un pezzo alla volta. Su API 24 RECORD_AUDIO va chiesto a
+     runtime, ma da device owner si concede da solo senza domande. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="dev.casa">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Il calendario, in sola lettura: Casa mostra gli impegni che il
+         sincronizzatore di Google ha gia' scritto nel provider di sistema. Non
+         scrive niente, quindi WRITE_CALENDAR non c'e' - chi sposta il dentista
+         lo fa dal telefono. Da device owner il permesso si concede da soli
+         (vedi MainActivity.preparaIlCalendario): su un apparecchio da muro non
+         c'e' nessuno che tocchi "Consenti". -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+
+    <!-- Le colonne del suono nella Home. Il visualizzatore sulla sessione zero
+         - il mescolatore di uscita - vuole RECORD_AUDIO, che c'e' gia' sopra
+         per il microfono, ma AudioFlinger si rifiuta lo stesso di creare
+         l'effetto se chi lo chiede non ha anche questo: "AudioEffect: set():
+         AudioFlinger could not create effect, status: -1", errore -3, e in
+         Java una RuntimeException che parla d'altro. E' di protezione normal,
+         quindi arriva con l'installazione senza chiedere niente. -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- Il fuso orario. Questo ROM cinese nasce con Asia/Shanghai, e sul
+         tablet non c'e' una SIM che lo corregga: l'orologio segna l'ora di
+         Pechino su un muro italiano. auto_time_zone e' acceso ma non ha
+         nessuno che gli dica il fuso, quindi resta quello di fabbrica per
+         sempre, e da adb non si cambia - persist.sys.timezone vuole i
+         permessi di sistema.
+         Qui invece si puo': su API 24 SET_TIME_ZONE ha protezione "normal"
+         (verificato con dumpsys su questo apparecchio), quindi si ottiene
+         all'installazione senza chiedere niente a nessuno. Casa e' la Home
+         di questa casa: sapere in che fuso sta e' il minimo. -->
+    <uses-permission android:name="android.permission.SET_TIME_ZONE" />
+
+    <!-- Lo sfondo di sistema. Il tablet e' di seconda mano e sotto Casa si
+         rivedeva ancora quello del ROM di chi lo aveva prima: si intravedeva a
+         ogni animazione di apertura di un'app e sul blocco. Nascondere il
+         problema con un rettangolo dentro Casa non serviva, perche' quel pixel
+         non e' di Casa, e' del sistema: l'unica cura e' possedere lo sfondo.
+         Da API 24 si impostano separatamente quello di sistema e quello di
+         blocco. Sono due permessi di livello "normal": concessi
+         all'installazione, senza chiedere niente a nessuno. -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+
+    <application
+        android:label="@string/app_name"
+        android:allowBackup="false"
+        android:supportsRtl="false"
+        android:hardwareAccelerated="true">
+
+        <!-- singleTask + stateNotNeeded: il tasto Home non deve mai creare una
+             seconda copia, e non c'e' stato da salvare - l'orologio si ridisegna
+             da se'. excludeFromRecents perche' un chiosco non ha "recenti".
+
+             userLandscape e non landscape. Sono tutte e due orizzontali, ma
+             "landscape" vuol dire una orizzontale sola - la rotazione a 90
+             gradi - e su questo tablet quella e' capovolta rispetto a come sta
+             il pannello: si leggeva sottosopra e non c'era modo di girarlo,
+             perche' con l'orientamento fisso l'app non guarda il sensore
+             nemmeno con la rotazione automatica accesa. userLandscape le
+             ammette tutte e due, 90 e 270, e sceglie come vuole chi guarda:
+             col sensore se la rotazione automatica e' accesa, altrimenti
+             quella bloccata nelle impostazioni. Verticale non diventa mai, che
+             e' il motivo per cui qui non c'e' "user" e basta.
+
+             Non serve altro: fra le due orizzontali lo schermo resta 1280x800,
+             quindi le Misure calcolate all'avvio valgono uguali, e
+             configChanges qui sopra evita comunque di ricostruire l'Activity.
+
+             Per inchiodarla a una delle due - un apparecchio da muro non deve
+             girare se qualcuno lo urta:
+                 adb shell settings put system accelerometer_rotation 0
+                 adb shell settings put system user_rotation 3      (0 1 2 3) -->
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/TemaCasa"
+            android:launchMode="singleTask"
+            android:stateNotNeeded="true"
+            android:excludeFromRecents="true"
+            android:screenOrientation="userLandscape"
+            android:configChanges="orientation|keyboardHidden|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- La Home provvisoria. Android 7 sceglie la Home prima di sbloccare
+             l'utente e in quel momento vuole un'attivita' direct boot aware:
+             di serie e' FallbackHome dentro Impostazioni, che Casa tiene
+             nascoste. Senza questa il tablet resta fermo sull'animazione di
+             avvio (vedi AvvioActivity). Priorita' -1000 come l'originale. -->
+        <activity
+            android:name=".AvvioActivity"
+            android:directBootAware="true"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+            android:screenOrientation="userLandscape">
+            <intent-filter android:priority="-1000">
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- L'ascoltatore di notifiche. Non legge le notifiche di nessuno:
+             esiste perche' MediaSessionManager.getActiveSessions() pretende che
+             chi chiama sia un ascoltatore abilitato, e usa il nome di questo
+             servizio come prova d'identita'. E' l'unica strada su API 24:
+             MEDIA_CONTENT_CONTROL e' riservato alle app di sistema e nemmeno il
+             device owner se lo concede.
+
+             Il permesso si da' da adb, una volta sola, con
+             tools/permesso-notifiche.ps1. Senza, Casa comanda lo stesso quel
+             che suona (dispatchMediaKeyEvent non chiede niente) ma non ne
+             conosce il titolo. -->
+        <service
+            android:name=".AscoltoNotifiche"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Timer e sveglie.
+
+             Le tre azioni servono tutte e tre, e la seconda e' quella che ci si
+             dimentica: reinstallare l'app cancella i suoi allarmi in silenzio,
+             quindi in sviluppo ogni build porterebbe via tutte le sveglie
+             senza dire niente - e ci si accorge la mattina dopo. La terza serve
+             perche' un allarme registrato e' un istante assoluto: spostare
+             l'orologio del tablet sposterebbe la sveglia delle sette, mentre
+             quello che una persona ha chiesto sono le sette.
+
+             exported="false": nessun altro ha motivo di far scattare le sveglie
+             di Casa. BOOT_COMPLETED e MY_PACKAGE_REPLACED arrivano lo stesso -
+             li manda il sistema, che non passa da qui. -->
+        <receiver
+            android:name=".RicevitoreAllarmi"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="dev.casa.ALLARME" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Il device owner si aggancia qui. Senza questo ricevitore
+             "dpm set-device-owner" non ha a cosa attaccarsi. -->
+        <receiver
+            android:name=".AdminReceiver"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>

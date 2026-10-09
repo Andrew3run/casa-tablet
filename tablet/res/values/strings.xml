@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Assistente Home</string>
+    <string name="admin_descrizione">Permette ad Assistente Home di comportarsi da apparecchio invece che da app: schermo intero senza uscite, barre di sistema spente, aggiornamenti senza domande.</string>
+</resources>
